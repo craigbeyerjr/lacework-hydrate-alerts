@@ -1,0 +1,100 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: Setup Lacework Webhook Filtering Mechanism
+Parameters:
+  Filter:
+    Type: String
+    Description: Filter for forwarding messages
+  DestinationURL:
+    Type: String
+    Description: Destination URL for messages
+  DestinationUsername:
+    Type: String
+    Description: Username for destination URL
+  DestinationPassword:
+    Type: String
+    Description: Password for destination URL
+  LwAccount:
+    Type: String
+    Description: Lacework Account name via API token
+  LwApiKey:
+    Type: String
+    Description: Lacework API Key via API token
+  LwApiSecret:
+    Type: String
+    Description: Lacework API Secret via API token
+  token:
+    Type: String
+    Description: Authorization token from SIEM/DestinationWebhook provider
+Resources:
+  LaceworkWebhookFilter:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: lambda_function.lambda_handler
+      Runtime: python3.9
+      CodeUri: s3://craig-labfun-lwcs-lacework-eks/lambd-webhook-code/deployment-package.zip
+      Description: ''
+      MemorySize: 128
+      Timeout: 3
+      Role: !GetAtt LaceworkWebhookFilterFunctionRole.Arn
+      Environment:
+        Variables:
+          filter:
+            Ref: Filter
+          webhookurl:
+            Ref: DestinationURL
+          webhookusername:
+            Ref: DestinationUsername
+          webhookpassword:
+            Ref: DestinationPassword
+  LaceworkWebhookFilterFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - lambda.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      Path: "/"
+      Policies:
+      - PolicyName: AppendToLogsPolicy
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action:
+            - logs:CreateLogGroup
+            - logs:CreateLogStream
+            - logs:PutLogEvents
+            Resource: "*"
+  LaceworkWebhookFilterUrlPermissions:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref LaceworkWebhookFilter
+      Action: lambda:InvokeFunctionUrl
+      Principal: "*"
+      FunctionUrlAuthType: NONE
+  LaceworkWebhookFilterUrl:
+    Type: AWS::Lambda::Url
+    Properties:
+      TargetFunctionArn: !Ref LaceworkWebhookFilter
+      AuthType: NONE
+Metadata: 
+  AWS::CloudFormation::Interface: 
+    ParameterGroups: 
+      - 
+        Label: 
+          default: "Filtering"
+        Parameters: 
+          - Filter
+      - 
+        Label: 
+          default: "Message Forwarding Destination"
+        Parameters: 
+          - DestinationURL
+          - DestinationUsername
+          - DestinationPassword
