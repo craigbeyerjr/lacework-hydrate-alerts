@@ -35,7 +35,7 @@ Resources:
       CodeUri: s3://craig-labfun-lwcs-lacework-eks/lambd-webhook-code/deployment-package.zip
       Description: ''
       MemorySize: 128
-      Timeout: 3
+      Timeout: 300
       Role: !GetAtt LaceworkWebhookFilterFunctionRole.Arn
       Environment:
         Variables:
@@ -47,6 +47,14 @@ Resources:
             Ref: DestinationUsername
           webhookpassword:
             Ref: DestinationPassword
+          LwAccount:
+            Ref: LwAccount
+          LwApiKey:
+            Ref: LwApiKey
+          LwApiSecret:
+            Ref: LwApiSecret
+          token:
+            Ref: token
   LaceworkWebhookFilterFunctionRole:
     Type: AWS::IAM::Role
     Properties:
