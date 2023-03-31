@@ -1,5 +1,5 @@
 # lacework-hydrate-alerts
-Lacework webhook lambda function to hydrate alerts through the API Details endpoint  This lambda function leverages the LaceworkSDK to interact with the LaceworkAPI
+Lacework webhook lambda function to hydrate alerts through the API Details endpoint. This lambda function leverages the LaceworkSDK to interact with the LaceworkAPI
 
 ## Deployment Guide
 Open your AWS console, navigate to the CloudFormation console and select Create Stack
