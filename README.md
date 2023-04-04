@@ -5,7 +5,7 @@ Lacework webhook lambda function to hydrate alerts through the API Details endpo
 Open your AWS console, navigate to the CloudFormation console and select Create Stack
 
 Add the following URL as the template and click Next:
-https://craig-labfun-lwcs-lacework-eks.s3.us-west-1.amazonaws.com/lambd-webhook-code/LaceworkWebhookFilter.yaml
+https://lacework-hydrate-alerts.s3.amazonaws.com/LaceworkWebhookFilter.yaml
 
 Provide values for the following environement variables:
 - webhookurl :: destination webhook url
