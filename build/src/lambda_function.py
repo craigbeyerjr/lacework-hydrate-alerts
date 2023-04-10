@@ -31,16 +31,17 @@ def lambda_handler(event, context):
 
     # Instantiate a LaceworkClient instance
     try:
-        lacework_client = LaceworkClient(account=os.environ['LW_ACCOUNT'],
-                    api_key=os.environ['LW_API_KEY'],
-                    api_secret=os.environ['LW_API_SECRET'])
+        lacework_client = LaceworkClient(account=os.environ['LwAccount'],
+                    api_key=os.environ['LwApiKey'],
+                    api_secret=os.environ['LwApiSecret'])
     except Exception as e:
         logger.error(f'Unable to configure Lacework client: {e}')
         
     #Collect Alert Details
     try: 
-        alertDetails = lacework_client.alerts.get_details("51645", "Details")
-        #data['event_id']
+        #logger.error(event["event_id"])
+        #print(data["event_id"])
+        alertDetails = lacework_client.alerts.get_details(data["event_id"], "Details")
         #merge alertDetails with data
         data=alertDetails
     except Exception as e:
@@ -56,14 +57,17 @@ def lambda_handler(event, context):
     logger.debug('Load Webhook Password')
     webhookPassword=load_parameter(event, 'webhookpassword')
 
+    '''
     logger.debug('Load http method used')
     httpMethod= event['requestContext']['http']['method']
     logger.debug(httpMethod)
-
+    '''
+    
     logger.debug('Parse filter')
     filter=parse_json(filter)
     logger.debug('Parse body')
     data=parse_json(data)
+    #logger.info(f"Length: {len(data['data'])}")
 
     logger.debug('Evaluate filter')
     result=eval_filter(filter, data)
@@ -75,7 +79,7 @@ def lambda_handler(event, context):
 
         logger.info('Forward data using Webhook')
         try:
-            r = requests.request('POST', webhookUrl, headers={'Content-type': 'application/json', 'Authorization': 'Bearer '+os.getenv('token')}, data=json.dumps(data), auth=webhookAuth)
+            r = requests.post(webhookUrl, headers={'Content-type': 'application/json', 'Authorization': 'Bearer '+os.getenv('token')}, data=json.dumps(data))
             logger.debug('Success!')
             logger.debug(r)
             httpResult={

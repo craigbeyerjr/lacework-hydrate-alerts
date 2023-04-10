@@ -31,9 +31,9 @@ def lambda_handler(event, context):
 
     # Instantiate a LaceworkClient instance
     try:
-        lacework_client = LaceworkClient(account=os.environ['LW_ACCOUNT'],
-                    api_key=os.environ['LW_API_KEY'],
-                    api_secret=os.environ['LW_API_SECRET'])
+        lacework_client = LaceworkClient(account=os.environ['LwAccount'],
+                    api_key=os.environ['LwApiKey'],
+                    api_secret=os.environ['LwApiSecret'])
     except Exception as e:
         logger.error(f'Unable to configure Lacework client: {e}')
         
@@ -51,13 +51,13 @@ def lambda_handler(event, context):
     webhookUrl=load_parameter(event, 'webhookurl')
     logger.debug(webhookUrl) 
 
+    
     logger.debug('Load Webhook Username')
     webhookUsername=load_parameter(event, 'webhookusername')
 
     logger.debug('Load Webhook Password')
     webhookPassword=load_parameter(event, 'webhookpassword')
-
-    '''
+    ''''
     logger.debug('Load http method used')
     httpMethod= event['requestContext']['http']['method']
     logger.debug(httpMethod)
@@ -79,7 +79,7 @@ def lambda_handler(event, context):
 
         logger.info('Forward data using Webhook')
         try:
-            r = requests.request('POST', webhookUrl, headers={'Content-type': 'application/json', 'Authorization': 'Bearer '+os.getenv('token')}, data=json.dumps(data), auth=webhookAuth)
+            r = requests.post(webhookUrl, headers={'Content-type': 'application/json', 'Authorization': 'Bearer '+os.getenv('token')}, data=json.dumps(data))
             logger.debug('Success!')
             logger.debug(r)
             httpResult={

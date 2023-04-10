@@ -32,7 +32,7 @@ Resources:
     Properties:
       Handler: lambda_function.lambda_handler
       Runtime: python3.9
-      CodeUri: s3://craig-labfun-lwcs-lacework-eks/lambd-webhook-code/deployment-package.zip
+      CodeUri: s3://lacework-hydrate-alerts/deployment-package.zip
       Description: ''
       MemorySize: 128
       Timeout: 300
